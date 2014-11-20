@@ -10,7 +10,7 @@ import java.util.Map;
  * 
  * @author Michael Lane <mlane@gatech.edu>
  */
-public class SortingSnippets {
+public final class SortingSnippets {
     
     /**
      * Sorts an array according to values stored in a Map. 

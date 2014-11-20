@@ -7,7 +7,7 @@ import org.apache.commons.lang3.text.WordUtils;
  * 
  * @author Michael Lane
  */
-public class StringSnippets {
+public final class StringSnippets {
     
     /**
      * Converts a string of underscores to a camelfied string; e.g.
