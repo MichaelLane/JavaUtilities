@@ -2,7 +2,6 @@ package maps;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.google.common.collect.Maps;
 /**
  *
  * @author Michael Lane <mlane@gatech.edu>
@@ -10,6 +9,18 @@ import com.google.common.collect.Maps;
 public final class MapsSnippets {
     
     /**
+     * Calculates the sum of two maps. For example, if
+     * map1 = {"hi"=2, "hello"=3}
+     * map2 = {"yo"=4, "hello"=5}
+     * 
+     * then
+     * sumMaps(map1, map2) = {"hi"=2, "hello"=8.0, "yo"=4}
+     * 
+     * Notice if one key is present in one map but not in the other, the sum is
+     * simply the value of that key. Also notice that sums are doubles; this was
+     * necessary to make the code reasonably concise. For this reason, VALUES SHOULD 
+     * ONLY CONTAIN NUMBERS THAT CAN BE LOSSLESSLY CONVERTED TO DOUBLES.
+     * 
      * 
      * @param <K>
      * @param <V>
