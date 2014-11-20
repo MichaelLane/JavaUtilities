@@ -41,8 +41,10 @@ public class SortingSnippets {
             doubleValues.put(key, values.get(key).doubleValue());
         }
         Collections.sort(list, (T t1, T t2) -> {
-            if (doubleValues.get(t1) > doubleValues.get(t2)) return 1;
-            if (doubleValues.get(t1) < doubleValues.get(t2)) return -1;
+            Double v1 = doubleValues.get(t1);
+            Double v2 = doubleValues.get(t2);
+            if (v1 > v2) return 1;
+            if (v1 < v2) return -1;
             return 0;
         });
     }
