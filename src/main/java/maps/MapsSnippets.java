@@ -24,12 +24,14 @@ public final class MapsSnippets {
      * 
      * @param <K>
      * @param <V>
-     * @param map1
-     * @param map2
+     * @param map1 non-null
+     * @param map2 non-null
      * @return 
      */
     public static <K> Map<K, Number> sumMaps(
         Map<K, ? extends Number> map1, Map<K, ? extends Number> map2) {
+        
+        if (map1 == null || map2 == null) return null;
         
         Map<K, Number> sumMap = new HashMap(map2);
         
