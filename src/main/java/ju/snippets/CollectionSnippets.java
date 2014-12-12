@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static ju.snippets.ComparatorSnippets.*;
+import static ju.snippets.NumberSnippets.*;
 
 /**
  *
@@ -12,7 +14,7 @@ import java.util.Map;
  */
 public final class CollectionSnippets {
     
-    public static <T> void addAllUniquely(Collection<? super T> coll, Collection<T> withColl) {
+    public static <T> void addAllUniquely(Collection<T> coll, Collection<? extends T> withColl) {
         for (T item : withColl) {
             if (!coll.contains(item)) {
                 coll.add(item);
@@ -41,20 +43,24 @@ public final class CollectionSnippets {
      * @param list non-null
      * @param values non-null
      */
-    public static <T> void sortUsingValuesInMap(List<T> list, Map<T, ? extends Number> values) {
+    public static <T> void sortUsingValuesInMap(
+    List<? extends T> list, Map<T, ? extends Number> values) {
         
-        if (list == null || values == null) return;
+        Map<T, Double> doubleValues = convertToDoubleMap(values);
+        Collections.sort(list, comparatorUsingValuesInMap(doubleValues));
+    }
+    
+    public static <T> T getMinUsingValuesInMap(
+    List<? extends T> list, Map<T, ? extends Number> values) {
         
-        Map<T, Double> doubleValues = new HashMap();
-        for (T key : values.keySet()) {
-            doubleValues.put(key, values.get(key).doubleValue());
-        }
-        Collections.sort(list, (T t1, T t2) -> {
-            Double v1 = doubleValues.get(t1);
-            Double v2 = doubleValues.get(t2);
-            if (v1 > v2) return 1;
-            if (v1 < v2) return -1;
-            return 0;
-        });
+        Map<T, Double> doubleValues = convertToDoubleMap(values);
+        return Collections.min(list, comparatorUsingValuesInMap(doubleValues));
+    }
+    
+    public static <T> T getMaxUsingValuesInMap(
+    List<? extends T> list, Map<T, ? extends Number> values) {
+        
+        Map<T, Double> doubleValues = convertToDoubleMap(values);
+        return Collections.max(list, comparatorUsingValuesInMap(doubleValues));
     }
 }
