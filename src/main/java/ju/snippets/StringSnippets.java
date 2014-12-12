@@ -1,4 +1,4 @@
-package strings;
+package ju.snippets;
 
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -27,7 +27,10 @@ public final class StringSnippets {
         // take out underscores
         toReturn = toReturn.replaceAll("_", "");
         // make the first character big or little case, depending on str
-        toReturn = new StringBuilder(toReturn).replace(0, 1, str.substring(0, 1)).toString();
+        toReturn = 
+            new StringBuilder(toReturn)
+            .replace(0, 1, str.substring(0, 1))
+            .toString();
         return toReturn;
         
 	}

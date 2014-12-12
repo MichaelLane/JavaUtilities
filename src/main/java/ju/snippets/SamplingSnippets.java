@@ -1,9 +1,11 @@
-package probability;
+package ju.snippets;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.apache.commons.math3.distribution.AbstractRealDistribution;
+import org.apache.commons.math3.distribution.AbstractIntegerDistribution;
+import ju.probability.SamplingBoundsException;
 
 /**
  *
@@ -121,5 +123,30 @@ public class SamplingSnippets {
                 return sample;
             }
         }
+        
+        throw new SamplingBoundsException();
+    }
+    
+    public static double sampleAboveBound(
+    AbstractIntegerDistribution distro, double bound, int attempts) {
+        return sampleWithinBounds(distro, bound, Double.POSITIVE_INFINITY, attempts);
+    }
+    
+    public static double sampleBelowBound(
+    AbstractIntegerDistribution distro, double bound, int attempts) {
+        return sampleWithinBounds(distro, Double.NEGATIVE_INFINITY, bound, attempts);
+    }
+    
+    public static double sampleWithinBounds(
+    AbstractIntegerDistribution distro, double lower, double upper, int attempts) {
+        
+        for (int attempt = 0; attempt < attempts; attempt++) {
+            double sample = distro.sample();
+            if (sample >= lower && sample <= upper) {
+                return sample;
+            }
+        }
+        
+        throw new SamplingBoundsException();
     }
 }

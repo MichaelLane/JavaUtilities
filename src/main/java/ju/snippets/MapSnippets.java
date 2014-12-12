@@ -1,12 +1,15 @@
-package maps;
+package ju.snippets;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import static ju.snippets.CollectionSnippets.*;
+
 /**
  *
  * @author Michael Lane <mlane@gatech.edu>
  */
-public final class MapsSnippets {
+public final class MapSnippets {
     
     /**
      * Calculates the sum of two maps. For example, if
@@ -23,7 +26,6 @@ public final class MapsSnippets {
      * 
      * 
      * @param <K>
-     * @param <V>
      * @param map1 non-null
      * @param map2 non-null
      * @return 
@@ -40,5 +42,19 @@ public final class MapsSnippets {
                 a.doubleValue() + b.doubleValue()));        
         
         return sumMap;
+    }
+    
+    public static <K, V> void unionListMaps(
+    Map<K, List<V>> map, 
+    Map<? extends K, ? extends List<V>> withMap) {
+        
+        withMap.forEach((k, v) -> {
+            List<V> old = map.get(k);
+            if (old != null) {
+                addAllUniquely(old, v);
+            } else {
+                map.put(k, v);
+            }
+        });
     }
 }

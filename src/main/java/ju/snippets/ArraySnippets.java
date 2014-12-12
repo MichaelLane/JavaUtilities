@@ -1,8 +1,7 @@
-package arrays;
+package ju.snippets;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +9,7 @@ import java.util.Map;
  * 
  * @author Michael Lane <mlane@gatech.edu>
  */
-public final class SortingSnippets {
+public final class ArraySnippets {
     
     /**
      * Sorts an array according to values stored in a Map. 
@@ -51,3 +50,4 @@ public final class SortingSnippets {
         });
     }
 }
+

@@ -1,4 +1,4 @@
-package numbers;
+package ju.snippets;
 
 /**
  *

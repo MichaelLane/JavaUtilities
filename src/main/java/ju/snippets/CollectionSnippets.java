@@ -1,5 +1,6 @@
-package collections;
+package ju.snippets;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +10,16 @@ import java.util.Map;
  *
  * @author Michael Lane <mlane@gatech.edu>
  */
-public final class SortingSnippets {
-
+public final class CollectionSnippets {
+    
+    public static <T> void addAllUniquely(Collection<? super T> coll, Collection<T> withColl) {
+        for (T item : withColl) {
+            if (!coll.contains(item)) {
+                coll.add(item);
+            }
+        }
+    }
+    
     /**
      * Sorts a List according to values stored in a Map. 
      * 
@@ -32,7 +41,7 @@ public final class SortingSnippets {
      * @param list non-null
      * @param values non-null
      */
-    public static <T> void sortUsingValuesInMap(List<T> list, Map<T, Number> values) {
+    public static <T> void sortUsingValuesInMap(List<T> list, Map<T, ? extends Number> values) {
         
         if (list == null || values == null) return;
         

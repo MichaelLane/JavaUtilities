@@ -1,4 +1,4 @@
-package jaxp;
+package ju.snippets;
 
 import java.util.ArrayList;
 import java.util.List;

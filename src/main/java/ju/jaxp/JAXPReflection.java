@@ -1,4 +1,4 @@
-package jaxp;
+package ju.jaxp;
 
 /**
  * This can construct classes and invoke methods based on data provided in XML 

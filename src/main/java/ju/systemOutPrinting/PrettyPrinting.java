@@ -1,4 +1,4 @@
-package debugging;
+package ju.systemOutPrinting;
 
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +52,7 @@ public final class PrettyPrinting {
         }
     }
     
-    public static <K, V> void prettyPrintIterWithMap(String message, Iterable<K> iter, Map<K, V> map) {
+    public static <K, V> void prettyPrintMapSubset(String message, Iterable<K> iter, Map<K, V> map) {
         prettyPrintMapSubset(message, iter, map, 1);
     }
     

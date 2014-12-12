@@ -1,4 +1,4 @@
-package SystemOutPrinting;
+package ju.systemOutPrinting;
 
 /**
  *
