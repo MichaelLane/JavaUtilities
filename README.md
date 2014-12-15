@@ -1,7 +1,7 @@
 JavaUtilities
 =============
 
-Some general-use classes and static methods. This project has no direction, and I treat it as a sandbox. Currently, I am implementing several machine-learning algorithms, which I have not yet committed because it has not been entirely debugged. The machine-learning may branch off into its own repo if it gets large enough.
+Some general-use classes and static methods. This project has no direction, and I treat it as a sandbox. 
 
 The build script (build.gradle) only works in the Netbeans IDE, I believe (though I haven't actually tested this). I will make it more portable when the need arises.
 
