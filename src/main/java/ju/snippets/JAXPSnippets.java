@@ -18,14 +18,12 @@ public final class JAXPSnippets {
      * Behaves as you would expect, except that if node implements Document,
      * then this returns the child elements of node.getDocumentElement().
      * 
+     * #needtest
+     * 
      * @param node non-null
      * @return
      */
     public static List<Element> getChildElements(Node node) {
-        
-        if (node == null) {
-            return null;
-        }
         
         if (node.getNodeType() == Node.DOCUMENT_NODE) {
             node = ((Document) node).getDocumentElement();
@@ -46,6 +44,8 @@ public final class JAXPSnippets {
      * Returns the idref attribute or the id attribute, depending on whichever
      * exists. If both exist, then return the idref attribute.
      * 
+     * #needtest
+     * 
      * @param element must be non-null
      * @return 
      */
@@ -62,6 +62,8 @@ public final class JAXPSnippets {
     
     /**
      * Find the Element children of a given node by a tag name.
+     * 
+     * #needtest
      * 
      * @param tagName non-null and non-empty
      * @param node non-null

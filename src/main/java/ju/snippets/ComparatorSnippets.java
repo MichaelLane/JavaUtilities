@@ -9,6 +9,12 @@ import java.util.Map;
  */
 public class ComparatorSnippets {
     
+    /**
+     * @param <K>
+     * @param <V>
+     * @param values
+     * @return 
+     */
     public static <K, V extends Comparable> Comparator<K> comparatorUsingValuesInMap(
     Map<K, V> values) {
         

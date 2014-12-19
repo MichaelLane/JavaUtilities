@@ -2,18 +2,24 @@ package ju.snippets;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import static ju.snippets.ComparatorSnippets.*;
-import static ju.snippets.NumberSnippets.*;
+import ju.tbd.ItemIndexPair;
 
 /**
  *
  * @author Michael Lane <mlane@gatech.edu>
  */
 public final class CollectionSnippets {
-    
+
+    /**
+     * 
+     * @param <T>
+     * @param coll
+     * @param withColl 
+     */
     public static <T> void addAllUniquely(Collection<T> coll, Collection<? extends T> withColl) {
         for (T item : withColl) {
             if (!coll.contains(item)) {
@@ -44,23 +50,64 @@ public final class CollectionSnippets {
      * @param values non-null
      */
     public static <T> void sortUsingValuesInMap(
-    List<? extends T> list, Map<T, ? extends Number> values) {
+    List<? extends T> list, Map<T, ? extends Comparable> values) {
         
-        Map<T, Double> doubleValues = convertToDoubleMap(values);
-        Collections.sort(list, comparatorUsingValuesInMap(doubleValues));
+        Collections.sort(list, comparatorUsingValuesInMap(values));
     }
     
-    public static <T> T getMinUsingValuesInMap(
-    List<? extends T> list, Map<T, ? extends Number> values) {
+    /**
+     * @param <K>
+     * @param list
+     * @param values
+     * @return 
+     */
+    public static <K> ItemIndexPair<K> getMinUsingValuesInMap(
+    List<? extends K> list, Map<K, ? extends Comparable> values) {
         
-        Map<T, Double> doubleValues = convertToDoubleMap(values);
-        return Collections.min(list, comparatorUsingValuesInMap(doubleValues));
+        if (list.isEmpty()) return null;
+        
+        ListIterator<? extends K> iter = list.listIterator();
+        int index = 0;
+        int minIndex = 0;
+        K minItem = iter.next();
+        Comparable minValue = values.get(minItem);
+        while (iter.hasNext()) {
+            K item = iter.next();
+            Comparable value = values.get(item);
+            if (value.compareTo(minValue) < 0) {
+                minIndex = index;
+            }
+            index++;
+        }
+        
+        return new ItemIndexPair(minItem, minIndex);
     }
     
-    public static <T> T getMaxUsingValuesInMap(
-    List<? extends T> list, Map<T, ? extends Number> values) {
+    /**
+     * @param <K>
+     * @param list
+     * @param values
+     * @return 
+     */
+    public static <K> ItemIndexPair<K> getMaxUsingValuesInMap(
+    List<? extends K> list, Map<K, ? extends Comparable> values) {
         
-        Map<T, Double> doubleValues = convertToDoubleMap(values);
-        return Collections.max(list, comparatorUsingValuesInMap(doubleValues));
+        if (list.isEmpty()) return null;
+        
+        ListIterator<? extends K> iter = list.listIterator();
+        int index = 0;
+        int maxIndex = 0;
+        K maxItem = iter.next();
+        Comparable maxValue = values.get(maxItem);
+        while (iter.hasNext()) {
+            K item = iter.next();
+            Comparable value = values.get(item);
+            if (value.compareTo(maxValue) > 0) {
+                maxIndex = index;
+            }
+            index++;
+        }
+        
+        return new ItemIndexPair(maxItem, maxIndex);
     }
 }

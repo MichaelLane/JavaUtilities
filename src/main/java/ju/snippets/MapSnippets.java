@@ -1,9 +1,11 @@
 package ju.snippets;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static ju.snippets.CollectionSnippets.*;
+import static ju.snippets.NumberSnippets.*;
 
 /**
  *
@@ -24,37 +26,50 @@ public final class MapSnippets {
      * necessary to make the code reasonably concise. For this reason, VALUES SHOULD 
      * ONLY CONTAIN NUMBERS THAT CAN BE LOSSLESSLY CONVERTED TO DOUBLES.
      * 
-     * 
      * @param <K>
+     * @param <V>
      * @param map1 non-null
      * @param map2 non-null
      * @return 
      */
-    public static <K> Map<K, Number> sumMaps(
-        Map<K, ? extends Number> map1, Map<K, ? extends Number> map2) {
+    public static <K, V extends Number> Map<K, Double> sumMaps(
+        Map<K, V> map1, Map<K, V> map2) {
         
-        if (map1 == null || map2 == null) return null;
+        Map<K, Double> sumMap = new HashMap(convertToDoubleMap(map2));
         
-        Map<K, Number> sumMap = new HashMap(map2);
-        
-        map1.forEach((k, v) -> 
-            sumMap.merge(k, v, (a, b) ->
-                a.doubleValue() + b.doubleValue()));        
+        map1.forEach((k, v) -> {
+            sumMap.merge(k, v.doubleValue(), (a, b) -> {
+                return a + b;
+            });
+        });
         
         return sumMap;
     }
     
-    public static <K, V> void unionListMaps(
-    Map<K, List<V>> map, 
-    Map<? extends K, ? extends List<V>> withMap) {
+    /**
+     * @param <K>
+     * @param <V>
+     * @param map
+     * @param withMap 
+     */
+    public static <K, V, C extends Collection<V>> void unionCollMaps(
+    Map<K, C> map, 
+    Map<? extends K, ? extends C> withMap) {
         
         withMap.forEach((k, v) -> {
-            List<V> old = map.get(k);
+            Collection<V> old = map.get(k);
             if (old != null) {
                 addAllUniquely(old, v);
             } else {
                 map.put(k, v);
             }
         });
+    }
+    
+    public static <K, V, C extends Collection<V>> void addToCollMap(
+    Map<K, C> map, K key, V value) {
+        
+        C old = map.get(key);
+        old.add(value);
     }
 }
