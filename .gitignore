@@ -5,3 +5,5 @@
 /.gradle
 *.class
 *.lock
+/Testy/.nb-gradle/private/
+/Testy/build/
