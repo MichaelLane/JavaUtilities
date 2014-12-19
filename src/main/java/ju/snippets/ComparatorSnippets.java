@@ -7,7 +7,7 @@ import java.util.Map;
  *
  * @author Michael Lane <mlane@gatech.edu>
  */
-public class ComparatorSnippets {
+public final class ComparatorSnippets {
     
     /**
      * @param <K>

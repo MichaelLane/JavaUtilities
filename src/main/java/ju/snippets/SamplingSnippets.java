@@ -8,7 +8,7 @@ import org.apache.commons.math3.distribution.RealDistribution;
  *
  * @author Michael Lane <mlane@gatech.edu>
  */
-public class SamplingSnippets {
+public final class SamplingSnippets {
    
 //    /**
 //	 * Sample ONCE from a normal distribution. If you want to sample

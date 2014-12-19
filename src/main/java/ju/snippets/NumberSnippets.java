@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * @author Michael Lane <mlane@gatech.edu>
  */
-public class NumberSnippets {
+public final class NumberSnippets {
     
     public static List<Double> convertToDoubleList(List<? extends Number> list) {
         List<Double> doubleList = new ArrayList(list.size());
