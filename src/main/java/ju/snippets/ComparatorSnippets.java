@@ -10,16 +10,22 @@ import java.util.Map;
 public final class ComparatorSnippets {
     
     /**
+     * Get the natural comparator for the keys of a map, where the values implement
+     * Comparable. For example:
+     * map = {"Hello" => 1, "Hi" => 2, "Sup" => 3}
+     * comparator = comparatorUsingValuesInMap(map)
+     * comparator.compare("Hello", "Hi") &lt; 0
+     * comparator.compare("Sup", "Hi") &gt; 0
      * @param <K>
      * @param <V>
-     * @param values
+     * @param map
      * @return 
      */
     public static <K, V extends Comparable> Comparator<K> comparatorUsingValuesInMap(
-    Map<K, V> values) {
+    Map<K, V> map) {
         
         return (K k1, K k2) -> {
-            return values.get(k1).compareTo(values.get(k2));
+            return map.get(k1).compareTo(map.get(k2));
         };
     }
 }
