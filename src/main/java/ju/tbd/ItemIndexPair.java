@@ -1,7 +1,7 @@
 package ju.tbd;
 
 /**
- *
+ * Represents an item and its index in a List, array, etc.
  * @author Michael Lane <mlane@gatech.edu>
  */
 public class ItemIndexPair<T> {
