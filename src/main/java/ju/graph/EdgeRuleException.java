@@ -4,9 +4,9 @@ package ju.graph;
  *
  * @author Michael Lane <mlane@gatech.edu>
  */
-class GraphInstantiationException extends RuntimeException {
+class EdgeRuleException extends Exception {
 
-    public GraphInstantiationException(String message) {
+    public EdgeRuleException(String message) {
         super(message);
     }
 
