@@ -1,6 +1,7 @@
 package ju.graph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -26,33 +27,41 @@ extends AbstractGraph<N, E> {
         super();
     }
     
-//    private List<Node> expanded;
+    // used for testing graph-search algos only
+    private List<N> expanded;
 
     /**
-     * Two nodes should not be connected with more than one edge. However, if a 
-     * DirectedEdge connects node A to B, and another DirectedEdge connects node
-     * B to A, this is not considered a violation of this rule. The rule of thumb
-     * is: if you are allowed to "walk" along a DirectedEdge in only the direction
-     * that it points, and along an UndirectedEdge in either direction, then there 
-     * can't be more than one way to "walk" from one node to another along single
-     * edges. #irrart
+     * Redundant edges are thrown out when constructing the graph. That is, if d1
+     * and d2 are DirectedEdges, and d1.equals(d2), then d1 is added to this Graph,
+     * but d2 is ignored. However, if 
+     * d1.getFromNode().equals(d2.getFromNode()) == true
+     * d1.getFromNode().equals(d2.getFromNode()) == true,
+     * and yet
+     * d1.equals(d2) == false,
+     * then a GraphInstantiationException is thrown.
      * 
-     * 
-     * @param directedEdges null specifies no DirectedEdges
-     * @param undirectedEdges null specifies no UndirectedEdges
+     * @param edges
+     * @throws ju.graph.EdgeRuleException
      */
-    public Graph(
-    List<? extends E> edges) {
+    public Graph(List<? extends E> edges) throws EdgeRuleException {
         
         super();
-//        prettyPrint("undirectedEdges", undirectedEdges, 1);
         
-        if (edges != null) {
-            for (E edge : edges) {
-                if (edge != null) {
-                    asymmetricalAdd(edge.getFromNode(), edge.getToNode(), edge);   
-                }
+        for (E edge : edges) {
+            // this code is verbatim that in this.addEdge(E)
+            NodePair<N> nodePair = new NodePair(edge.getFromNode(), edge.getToNode());
+            E oldEdge = this.edgeByNodePair.get(nodePair);
+            if (oldEdge != null && !oldEdge.equals(edge) 
+            && oldEdge.getFromNode().equals(edge.getFromNode())
+            && oldEdge.getToNode().equals(edge.getToNode())) {
+                throw new EdgeRuleException("Attempted to add to graph "
+                    + "two unequal DirectedEdges:\n"
+                    + edge.toString() + "\n" + oldEdge.toString() + "\nthat "
+                    + "connect the same nodes."); 
             }
+            this.edgeByNodePair.put(nodePair, edge);
+            addToCollMap(this.edgesByNode, nodePair.node1, edge, ArrayList.class);
+            addToCollMap(this.neighborsByNode, nodePair.node1, nodePair.node2, ArrayList.class);
         }
     }
     
@@ -70,43 +79,7 @@ extends AbstractGraph<N, E> {
 //        }
 //
 //    }
-
-    private void asymmetricalAdd(N fromNode, N toNode, E edge) {
-        
-//        System.out.println("Attempting to add " + nodePair.toString() + " in asymmetricalAdd");
-        NodePair<N> nodePair = new NodePair(fromNode, toNode);
-        
-        // this line is why you shouldn't have two nodes that are connected by both
-        // a DirectedEdge and an UndirectedEdge.
-        if (edgeByNodePair.get(nodePair) == null) {
-            edgeByNodePair.put(nodePair, edge);
-        } else {
-            throw new IllegalArgumentException("There is more than one way to\"walk\" "
-                + "from node " + fromNode.toString() + " to " + toNode.toString()
-                + ".");
-        }
-        
-        List<N> neighbors = neighborsByNode.get(fromNode);
-        List<E> theseEdges = edgesByNode.get(fromNode);
-        if (neighbors != null && !neighbors.contains(toNode)) {
-//            System.out.println(toNode.toString() + " added as neighbor of " + fromNode.toString());
-            neighbors.add(toNode);
-            theseEdges.add(edge);
-
-        } else if (neighbors == null) {
-//            System.out.println(toNode.toString() + " added as neighbor of " + fromNode.toString());
-            List<N> newNeighbors = new ArrayList();
-            newNeighbors.add(toNode);
-            neighborsByNode.put(fromNode, newNeighbors);
-            List<E> newEdges = new ArrayList();
-            newEdges.add(edge);
-            edgesByNode.put(fromNode, newEdges);
-        }
-    }
-
-    
-
-    
+   
 
     /**
      * This is a graph-search based implementation; i.e. it maintains a "visited"
@@ -136,7 +109,7 @@ extends AbstractGraph<N, E> {
 //        }
         Map<N, List<E>> pathByNode = new HashMap();
         // init pathByNode
-        List<N> neighbors = this.getNeighbors(start);
+        Set<N> neighbors = this.getNeighbors(start);
         for (N neighbor : neighbors) {
             E edge = this.getEdge(start, neighbor);
             List<E> path = new ArrayList();
@@ -233,7 +206,7 @@ extends AbstractGraph<N, E> {
             }
             List<E> path = pathByAction.get(action);
             // add neighbors to frontier
-            List<N> neighbors = this.getNeighbors(node);
+            Set<N> neighbors = this.getNeighbors(node);
             double cost = costByAction.get(action);
             for (N neighbor : neighbors) {
                 Action<N, E> next = new Action(neighbor, this.getEdge(node, neighbor));
@@ -461,7 +434,7 @@ extends AbstractGraph<N, E> {
     public Map<N, List<E>> dijkstra(N start) {
         
         Map<N, Double> costByNode = new HashMap();
-        List<N> neighbors = this.getNeighbors(start);
+        Set<N> neighbors = this.getNeighbors(start);
         List<N> frontier = new LinkedList(neighbors);
         Map<N, List<E>> pathByNode = new HashMap();
         pathByNode.put(start, new LinkedList());
@@ -520,7 +493,7 @@ extends AbstractGraph<N, E> {
         Deque<Integer> branchingFactors = new LinkedList();
         Set<N> visited = new HashSet();
         visited.add(start);
-        List<N> neighbors = this.getNeighbors(start);
+        Set<N> neighbors = this.getNeighbors(start);
         Deque<E> path = new LinkedList(); // path is returned, so it must implement List!
         Deque<N> frontier = new LinkedList(neighbors);
         N prevNode = start;
@@ -573,9 +546,17 @@ extends AbstractGraph<N, E> {
         // use fibonacci heap and adjacency list implementation
     }
     
-//    public List<Node> getExpanded() {
-//        return expanded;
-//    }
+    public void addExpanded(N node) {
+        expanded.add(node);
+    }
+    
+    public void resetExpanded() {
+        expanded = new LinkedList();
+    }
+    
+    public List<N> getExpanded() {
+        return expanded;
+    }
     
     
     
@@ -612,10 +593,20 @@ extends AbstractGraph<N, E> {
 //    }
 
     @Override
-    public void addEdge(E edge) {
-        this.edgeByNodePair.put(new NodePair(edge.getFromNode(), edge.getToNode()), edge);
-        addToCollMap(this.edgesByNode, edge.getFromNode(), edge);
-        addToCollMap(this.neighborsByNode, edge.getFromNode(), edge.getToNode());
+    public void addEdge(E edge) throws EdgeRuleException {
+        NodePair<N> nodePair = new NodePair(edge.getFromNode(), edge.getToNode());
+        E oldEdge = this.edgeByNodePair.get(nodePair);
+        if (oldEdge != null && !oldEdge.equals(edge) 
+        && oldEdge.getFromNode().equals(edge.getFromNode())
+        && oldEdge.getToNode().equals(edge.getToNode())) {
+            throw new EdgeRuleException("Attempted to add to graph "
+                + "two unequal DirectedEdges:\n"
+                + edge.toString() + "\n" + oldEdge.toString() + "\nthat "
+                + "connect the same nodes."); 
+        }
+        this.edgeByNodePair.put(nodePair, edge);
+        addToCollMap(this.edgesByNode, nodePair.node1, edge, ArrayList.class);
+        addToCollMap(this.neighborsByNode, nodePair.node1, nodePair.node2, ArrayList.class);
     }
 }
 
