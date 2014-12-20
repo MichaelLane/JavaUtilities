@@ -3,22 +3,30 @@ package ju.graph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import static ju.snippets.MapSnippets.*;
 
 /**
- *
+ * All Graph types must extend this class. 
+ * Currently, edges are limited to connect
+ * only two nodes; this class must be modified to allow edges that connect more 
+ * than two edges.
  * @author Michael Lane <mlane@gatech.edu>
  */
 public abstract class AbstractGraph<N extends Node, E extends Edge<N>> {
     
+    /** Map for getting the edge between a couple nodes. */
     protected final Map<NodePair<N>, E> edgeByNodePair;
-    protected final Map<N, List<N>> neighborsByNode;
-    protected final Map<N, List<E>> edgesByNode;
+    /** The nodes adjacent to a given node. */
+    protected final Map<N, Set<N>> neighborsByNode;
+    /** The edges attached to a given node. */
+    protected final Map<N, Set<E>> edgesByNode;
     
     protected AbstractGraph() {
         edgeByNodePair = new HashMap();
@@ -26,36 +34,34 @@ public abstract class AbstractGraph<N extends Node, E extends Edge<N>> {
         edgesByNode = new HashMap();
     }
     
-    public List<N> getNeighbors(N node) {
-        List<N> neighbors = neighborsByNode.get(node);
-        return (neighbors != null) ? neighbors : new ArrayList();
+    public Set<N> getNeighbors(N node) {
+        Set<N> neighbors = neighborsByNode.get(node);
+        return (neighbors != null) ? neighbors : new HashSet();
     }
-
-    public List<N> getNodes() {
-        return new ArrayList(neighborsByNode.keySet());
+    
+    public Set<N> getNodes() {
+        return neighborsByNode.keySet();
     }
     
     /**
-     * Returns a DirectedEdge if fromNode connects to toNode but not vice-versa;
-     * and returns a UndirectedEdge if both connect to each other.
-     *
-     * @param fromNode non-null
-     * @param toNode   non-null
-     * @return null if no Edge exists from fromNode to toNode
+     * #todo
+     * @param node1
+     * @param node2
+     * @return null if no edge exists between node1 and node2
      */
-    public E getEdge(N fromNode, N toNode) {
-
-        if (fromNode == null || toNode == null) {
-            return null;
-        }
-
-        NodePair<N> nodePair = new NodePair(fromNode, toNode);
-        return edgeByNodePair.get(nodePair);
+    public E getEdge(N node1, N node2) {
+        return edgeByNodePair.get(new NodePair(node1, node2));
     }
     
-    public List<N> getConnectedNodes(N node) {
+    /**
+     * Get all the nodes connected to the given node via some path; i.e. the transitive
+     * closure of the "neighbor" relation.
+     * @param node
+     * @return 
+     */
+    public Set<N> getConnectedNodes(N node) {
         
-        List<N> visited = new LinkedList();
+        Set<N> visited = new HashSet();
         List<N> frontier = new LinkedList();
         
         frontier.addAll(this.getNeighbors(node));
@@ -64,7 +70,7 @@ public abstract class AbstractGraph<N extends Node, E extends Edge<N>> {
             N n = frontier.remove(0);
             if (!visited.contains(n)) {
                 visited.add(n);
-                List<N> neighbors = this.getNeighbors(n);
+                Set<N> neighbors = this.getNeighbors(n);
                 for (N neighbor : neighbors) {
                     if (!visited.contains(neighbor)) {
                         frontier.add(neighbor);
@@ -75,12 +81,18 @@ public abstract class AbstractGraph<N extends Node, E extends Edge<N>> {
         return visited;
     }
     
-    public List<N> getDisconnections() {
-        List<N> nodes = this.getNodes();
+    /**
+     * Get a List of nodes that are all disconnected from each other, such that
+     * every node in this graph is connected to exactly one node in the returned
+     * List.
+     * @return 
+     */
+    public Set<N> getDisconnections() {
+        Set<N> nodes = this.getNodes();
         Iterator<N> nodesIter = nodes.iterator();
         int numNodes = nodes.size();
-        List<N> totalConnected = new LinkedList();
-        List<N> disconn = new LinkedList();
+        Set<N> totalConnected = new HashSet();
+        Set<N> disconn = new HashSet();
         while (totalConnected.size() < numNodes) {
             N n = nodesIter.next();
             while (totalConnected.contains(n)) {
@@ -93,28 +105,50 @@ public abstract class AbstractGraph<N extends Node, E extends Edge<N>> {
         return disconn;
     }
     
-    public List<E> getEdges() {
-        return new ArrayList(edgeByNodePair.values());
+    public Set<E> getEdges() {
+        return new HashSet(edgeByNodePair.values());
     }
     
-    public List<E> getEdges(N fromNode) {
-        List<E> theseEdges = edgesByNode.get(fromNode);
-        return (theseEdges != null) ? theseEdges : new ArrayList();
+    public Set<E> getEdges(N node) {
+        Set<E> theseEdges = edgesByNode.get(node);
+        return (theseEdges != null) ? theseEdges : new HashSet();
     }
     
-    public abstract void addEdge(E edge);
+    public abstract void addEdge(E edge) throws EdgeRuleException;
     
-    public void addAllEdges(Collection<? extends E> edges) {
+    public void addAllEdges(Collection<? extends E> edges) 
+    throws EdgeRuleException {
         for (E edge : edges) {
             this.addEdge(edge);
         }
     }
     
-    public void union(AbstractGraph<N, E> graph) { 
+    /**
+     * Add all the edges from the parameter graph to this graph that do not already
+     * occur in this graph. Since the edge rule for a superclass also applies to
+     * all its subclasses, if the parameter's type is not a subclass of this type,
+     * then a priori it is impossible to know if this union will obey the edge rule
+     * of this type. Even if the parameter's type is a subclass of this type, the
+     * edge rule may still be violated.
+     * 
+     * @param graph 
+     * @throws ju.graph.EdgeRuleException 
+     */
+    public void union(AbstractGraph<N, E> graph) throws EdgeRuleException { 
         
-        this.edgeByNodePair.putAll(graph.edgeByNodePair);
-        unionCollMaps(this.neighborsByNode, graph.neighborsByNode);
-        unionCollMaps(this.edgesByNode, graph.edgesByNode);
+        if (this.getClass().isAssignableFrom(graph.getClass())) {
+            Set<E> thoseEdges = graph.getEdges();
+            Set<E> theseEdges = this.getEdges();
+            for (E edge : thoseEdges) {
+                if (!theseEdges.contains(edge)) {
+                    this.addEdge(edge);
+                }
+            }
+        } else {
+            throw new EdgeRuleException("The type of the argument is not a subclass "
+                + "of this class. The type of the argument is " + graph.getClass().toString()
+                + ".");
+        }
     }
     
     public int getNumNodes() {
@@ -129,6 +163,11 @@ public abstract class AbstractGraph<N extends Node, E extends Edge<N>> {
         return !this.neighborsByNode.get(node).isEmpty();
     }
     
+    /**
+     * Simply represents a pair of nodes; this is how Edge data is encoded in this
+     * graph.
+     * @param <N> 
+     */
     protected static class NodePair<N extends Node> {
 
         public final N node1;
@@ -166,6 +205,12 @@ public abstract class AbstractGraph<N extends Node, E extends Edge<N>> {
         }
     }
     
+    /**
+     * Represents a Node (called the "state") and an Edge. Used for graph-search
+     * algos like A*.
+     * @param <N>
+     * @param <E> 
+     */
     protected static class Action<N extends Node, E extends Edge<N>>  {
         
         final N state;
