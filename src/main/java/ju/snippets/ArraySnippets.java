@@ -1,8 +1,10 @@
 package ju.snippets;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
+import static ju.snippets.ComparatorSnippets.*;
 
 /**
  * Some useful methods for sorting Arrays.
@@ -25,31 +27,17 @@ public final class ArraySnippets {
      * For several reasons, before any sorting occurs, the "values" Map is converted
      * to a new Map that maps keys to Doubles, rather than Numbers. For this reason,
      * VALUES SHOULD ONLY CONTAIN NUMBERS THAT CAN BE LOSSLESSLY CONVERTED TO DOUBLES.
-     * Such Numbers are: Byte, Short, Integer, Char, Long, Float, or Double. This 
-     * excludes BigInteger and BigDecimal in the standard Java API.
      * 
      * #needtest
      * 
-     * @param <T>
-     * @param array non-null
-     * @param values non-null
+     * @param <T1>
+     * @param <T2>
+     * @param array
+     * @param map
      */
-    public static <T> void sortUsingValuesInMap(T[] array, Map<T, Number> values) {
+    public static <T1, T2 extends T1> void sortUsingValuesInMap(T2[] array, Map<T1, ? extends Comparable> map) {
         
-        if (array == null || values == null) return;
-        
-        Map<T, Double> doubleValues = new HashMap();
-        for (T key : values.keySet()) {
-            doubleValues.put(key, values.get(key).doubleValue());
-        }
-        
-        Arrays.sort(array, (T t1, T t2) -> { //comparator
-            Double v1 = doubleValues.get(t1);
-            Double v2 = doubleValues.get(t2);
-            if (v1 > v2) return 1;
-            if (v1 < v2) return -1;
-            return 0;
-        });
+        Arrays.sort(array, comparatorUsingValuesInMap(map));
     }
 }
 
