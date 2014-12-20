@@ -2,7 +2,6 @@ package ju.snippets;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import static ju.snippets.CollectionSnippets.*;
 import static ju.snippets.NumberSnippets.*;
@@ -47,17 +46,25 @@ public final class MapSnippets {
     }
     
     /**
+     * Adds all of the key-value pairs from withMap to map. If two keys are incident
+     * in the two maps, then the union of their values are put into map. For example,
+     * map              = {1 => [4, 5], 2 => [6, 7]}
+     * withMap          = {1 => [4, 8], 3 => [9, 10]}
+     * unionCollMaps(map, withMap)
+     * map              = {1 => [4, 5, 8], 2 => [6, 7], 3 => [9, 10]}
+     * withMap          = {1 => [4, 8], 3 => [9, 10]}
+     * 
      * @param <K>
-     * @param <V>
+     * @param <C>
      * @param map
      * @param withMap 
      */
-    public static <K, V, C extends Collection<V>> void unionCollMaps(
+    public static <K, C extends Collection> void unionCollMaps(
     Map<K, C> map, 
     Map<? extends K, ? extends C> withMap) {
         
         withMap.forEach((k, v) -> {
-            Collection<V> old = map.get(k);
+            Collection old = map.get(k);
             if (old != null) {
                 addAllUniquely(old, v);
             } else {
@@ -66,10 +73,71 @@ public final class MapSnippets {
         });
     }
     
-    public static <K, V, C extends Collection<V>> void addToCollMap(
-    Map<K, C> map, K key, V value) {
+    /**
+     * Append values to a key in a Map, where the values in the Map are Collections. 
+     * Example:
+     * map = {"Hello" => [1, 2], "Hi" => [2, 3]}
+     * key = "Hello"
+     * values = [3, 4]
+     * addAllToCollMap(map, key, values)
+     * map = {"Hello" => [1, 2, 3, 4], "Hi" => [2, 3]}
+     * 
+     * If key is not present in map, then create it:
+     * map = {"Hello" => [1, 2], "Hi" => [2, 3]}
+     * key = "Sup"
+     * values = [5, 6]
+     * addAllToCollMap(map, key, values)
+     * map = {"Hello" => [1, 2], "Hi" => [2, 3], "Sup" => [5, 6]}
+     * 
+     * @param <K>
+     * @param <C>
+     * @param map
+     * @param key 
+     * @param values 
+     */
+    public static <K, C extends Collection> void addAllToCollMap(
+    Map<K, C> map, K key, C values) {
         
         C old = map.get(key);
-        old.add(value);
+        if (old != null) {
+            old.addAll(values);
+        } else {
+            map.put(key, values);
+        }
     }
+    
+    /**
+     * The natural companion to addAllToCollMap. If key does not exist in map, then
+     * a new Collection must be instantiated. It is not possible to infer the type
+     * to instantiate through generics, so a Class must be provided so that the 
+     * correct type is known at runtime.
+     * 
+     * @param <K>
+     * @param <V>
+     * @param <C>
+     * @param map
+     * @param key
+     * @param value
+     * @param cls
+     * @throws java.lang.ReflectiveOperationException Thrown if something goes wrong
+     * with instantiating the Collection.
+     */
+    public static <K, V, C extends Collection<? super V>> void addToCollMap(
+    Map<K, C> map, K key, V value, Class<? extends Collection> cls) {
+        
+        C old = map.get(key);
+        if (old != null) {
+            old.add(value);
+        } else {
+            C newColl = null;
+            try {
+                newColl = (C) cls.newInstance();
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException("Problem instantiating class: " + cls.toString());
+            }
+            newColl.add(value);
+            map.put(key, newColl);
+        }
+    }
+    
 }
