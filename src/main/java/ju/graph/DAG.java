@@ -13,11 +13,12 @@ extends Graph<N, E> {
         super();
     }
     
-    public DAG(List<? extends E> edges) {
+    public DAG(List<? extends E> edges) throws EdgeRuleException {
         this(edges, true);
     }
     
-    public DAG(List<? extends E> edges, boolean doCheck) {
+    public DAG(List<? extends E> edges, boolean doCheck) throws EdgeRuleException {
+        
         super();
         for (E edge : edges) {
             List<E> cycle = null;
@@ -27,7 +28,7 @@ extends Graph<N, E> {
             if (cycle == null) {
                 this.addEdge(edge);
             } else {
-                throw new GraphInstantiationException("Could not instantiate DAG;"
+                throw new EdgeRuleException("Could not instantiate DAG;"
                     + " cycle detected: " + cycle.toString());
             }
         }
