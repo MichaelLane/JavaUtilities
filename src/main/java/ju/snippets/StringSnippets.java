@@ -20,8 +20,6 @@ public final class StringSnippets {
      */
     public static String underscoreToCamel(String str) {
         
-        if (str == null) return null;
-        
         // capitalize the first character and every character after an underscore
         String toReturn = WordUtils.capitalize(str, '_');
         // take out underscores
