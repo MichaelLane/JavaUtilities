@@ -34,7 +34,7 @@ public final class MapSnippets {
     public static <K, V extends Number> Map<K, Double> sumMaps(
         Map<K, V> map1, Map<K, V> map2) {
         
-        Map<K, Double> sumMap = new HashMap(convertToDoubleMap(map2));
+        Map<K, Double> sumMap = convertValuesToDoubles(map2);
         
         map1.forEach((k, v) -> {
             sumMap.merge(k, v.doubleValue(), (a, b) -> {
